@@ -17,16 +17,20 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 import os
 
-# Register fonts
-pdfmetrics.registerFont(TTFont('Times New Roman', '/usr/share/fonts/truetype/english/Times-New-Roman.ttf'))
-pdfmetrics.registerFont(TTFont('SimHei', '/usr/share/fonts/truetype/chinese/SimHei.ttf'))
-pdfmetrics.registerFont(TTFont('DejaVuSans', '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'))
+# ===== SAFE FONT SETUP =====
+# Use built-in ReportLab font (always available)
+base_font = 'Times-Roman'
 
-# Register font families for bold/super/sub tags
-registerFontFamily('Times New Roman', normal='Times New Roman', bold='Times New Roman')
+# Optional: register DejaVuSans if present (for code blocks)
+dejavu_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+if os.path.exists(dejavu_path):
+    pdfmetrics.registerFont(TTFont('DejaVuSans', dejavu_path))
+
+registerFontFamily(base_font, normal=base_font, bold=base_font)
 
 # Create document
-output_path = "/home/z/my-project/download/Actformer_Architecture_Design.pdf"
+output_path = "Actformer_Architecture_Design.pdf"
+
 doc = SimpleDocTemplate(
     output_path,
     pagesize=letter,
@@ -35,8 +39,8 @@ doc = SimpleDocTemplate(
     topMargin=72,
     bottomMargin=72,
     title="Actformer Architecture Design",
-    author='Z.ai',
-    creator='Z.ai',
+    author='Abhishek Shah & Z.ai',
+    creator='Abhishek Shah & Z.ai',
     subject='A novel neural architecture for learning and predicting actions'
 )
 
@@ -46,7 +50,7 @@ styles = getSampleStyleSheet()
 # Cover title style
 cover_title_style = ParagraphStyle(
     name='CoverTitle',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=36,
     leading=44,
     alignment=TA_CENTER,
@@ -55,7 +59,7 @@ cover_title_style = ParagraphStyle(
 
 cover_subtitle_style = ParagraphStyle(
     name='CoverSubtitle',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=18,
     leading=24,
     alignment=TA_CENTER,
@@ -64,7 +68,7 @@ cover_subtitle_style = ParagraphStyle(
 
 cover_author_style = ParagraphStyle(
     name='CoverAuthor',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=14,
     leading=20,
     alignment=TA_CENTER,
@@ -74,7 +78,7 @@ cover_author_style = ParagraphStyle(
 # Heading styles
 h1_style = ParagraphStyle(
     name='Heading1Custom',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=20,
     leading=26,
     alignment=TA_LEFT,
@@ -85,7 +89,7 @@ h1_style = ParagraphStyle(
 
 h2_style = ParagraphStyle(
     name='Heading2Custom',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=16,
     leading=22,
     alignment=TA_LEFT,
@@ -96,7 +100,7 @@ h2_style = ParagraphStyle(
 
 h3_style = ParagraphStyle(
     name='Heading3Custom',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=14,
     leading=18,
     alignment=TA_LEFT,
@@ -108,7 +112,7 @@ h3_style = ParagraphStyle(
 # Body styles
 body_style = ParagraphStyle(
     name='BodyStyle',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=11,
     leading=16,
     alignment=TA_JUSTIFY,
@@ -119,7 +123,7 @@ body_style = ParagraphStyle(
 # Abstract style
 abstract_style = ParagraphStyle(
     name='AbstractStyle',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=10,
     leading=14,
     alignment=TA_JUSTIFY,
@@ -145,7 +149,7 @@ code_style = ParagraphStyle(
 # Table styles
 table_header_style = ParagraphStyle(
     name='TableHeader',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=11,
     textColor=colors.white,
     alignment=TA_CENTER
@@ -153,7 +157,7 @@ table_header_style = ParagraphStyle(
 
 table_cell_style = ParagraphStyle(
     name='TableCell',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=10,
     textColor=colors.black,
     alignment=TA_CENTER
@@ -161,7 +165,7 @@ table_cell_style = ParagraphStyle(
 
 table_cell_left_style = ParagraphStyle(
     name='TableCellLeft',
-    fontName='Times New Roman',
+    fontName=base_font,
     fontSize=10,
     textColor=colors.black,
     alignment=TA_LEFT
@@ -182,7 +186,7 @@ story.append(Paragraph("Architecture Design Document", cover_author_style))
 story.append(Spacer(1, 24))
 story.append(Paragraph("Version 1.0", cover_author_style))
 story.append(Spacer(1, 60))
-story.append(Paragraph("Z.ai Research", cover_author_style))
+story.append(Paragraph("Abhishek Shah & Z.ai Research", cover_author_style))
 story.append(Paragraph("2025", cover_author_style))
 story.append(PageBreak())
 
