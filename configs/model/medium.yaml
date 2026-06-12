@@ -1,0 +1,8 @@
+num_registers: 16
+register_dim: 64
+scratchpad_size: 256
+scratchpad_dim: 64
+hidden_dim: 256
+num_heads: 8
+num_layers: 4
+max_steps: 100

@@ -1,0 +1,68 @@
+{
+  "phase1": {
+    "best_em": 0.0,
+    "history": [
+      {
+        "epoch": 1,
+        "em": 0.0,
+        "pd": 0.025,
+        "loss": 354.5006809234619
+      },
+      {
+        "epoch": 2,
+        "em": 0.0,
+        "pd": 0.075,
+        "loss": 215.00400772094727
+      },
+      {
+        "epoch": 3,
+        "em": 0.0,
+        "pd": 0.1,
+        "loss": 111.82058591842652
+      },
+      {
+        "epoch": 4,
+        "em": 0.0,
+        "pd": 0.2571428571428571,
+        "loss": 45.71664361953735
+      },
+      {
+        "epoch": 5,
+        "em": 0.0,
+        "pd": 0.03125,
+        "loss": 18.352117240428925
+      }
+    ]
+  },
+  "phase2": {
+    "1": {
+      "em": 0.0,
+      "pd": 0.030303030303030304
+    },
+    "2": {
+      "em": 0.0,
+      "pd": 0.03333333333333333
+    },
+    "5": {
+      "em": 0.0,
+      "pd": 0.0
+    },
+    "10": {
+      "em": 0.0,
+      "pd": 0.16666666666666666
+    }
+  },
+  "phase3": {
+    "final": "SHORT_SEQUENCES",
+    "transitions": []
+  },
+  "phase4": {
+    "avg_reward": 0.25,
+    "error": "one of the variables needed for gradient computation has been modified by an inplace operation: [torch.FloatTensor [32, 49152]], which is output 0 of AsStridedBackward0, is at version 882; expected version 881 instead. Hint: enable anomaly detection to find the operation that failed to compute its gradient, with torch.autograd.set_detect_anomaly(True, check_nan=False)."
+  },
+  "phase5": {
+    "candidates": 20,
+    "adopted": 11,
+    "total": 11
+  }
+}

@@ -1,0 +1,9 @@
+defaults:
+  - model: medium
+  - training: curriculum
+
+task: addition
+min_digits: 1
+max_digits: 2
+num_samples: 10000
+seed: 42

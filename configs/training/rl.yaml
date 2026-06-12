@@ -1,0 +1,6 @@
+policy_lr: 1e-5
+value_lr: 1e-4
+gamma: 0.99
+entropy_coeff: 0.01
+rollouts_per_update: 16
+max_rollout_steps: 100
