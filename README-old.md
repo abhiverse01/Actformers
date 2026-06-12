@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Research%20Project-blue?style=for-the-badge" alt="Status">
   <img src="https://img.shields.io/badge/Version-1.0.0-green?style=for-the-badge" alt="Version">
@@ -1514,3 +1515,231 @@ If you find Actformer useful or interesting, please consider:
 <p align="center">
   <i>© 2026 Abhishek Shah. All rights reserved.</i>
 </p>
+=======
+# Actformer — Neural Networks That Learn Actions, Not Patterns
+
+> **Core Thesis**: Neural networks should predict *computational actions* (not tokens) to learn algorithms that generalize to any scale.
+
+A research-grade ML codebase implementing the Actformer architecture — a system where a model learns to emit structured action tokens (ADD, LOAD, OUTPUT, etc.) that are executed against an explicit working memory, rather than predicting output tokens directly. This enables true algorithmic generalization: train on 2-digit addition and test at 10-digit with no performance degradation.
+
+## Architecture Overview
+
+```
+Input → NumericInputEncoder → WorkingMemory → ActionPredictor → ActionToken → ExecutionEngine → OutputDecoder → Result
+                                         ↑                                                                    |
+                                         └──────────────────── action loop (N steps) ──────────────────────────┘
+```
+
+### Key Components
+
+| Module | Description |
+|--------|-------------|
+| **ActionToken** | Structured 5-tuple `(op_id, arg0, arg1, arg2, modifier)` with factorized learned embeddings |
+| **WorkingMemory** | Register file (fast storage) + Scratchpad (content-addressable) + Pointer network |
+| **ExecutionEngine** | Dispatches 24 action types against memory; soft branches in training, hard in inference |
+| **DifferentiablePrimitives** | 12 differentiable operations (ADD, SUBTRACT, MULTIPLY, COMPARE, DIGIT_EXTRACT, etc.) |
+| **ActionPredictor** | Dual-attention transformer: state encoder + history decoder → flat vocab logits |
+| **ActionTraceGenerator** | Symbolic executor producing ground-truth action traces for arithmetic |
+| **CurriculumTrainer** | 6-phase progressive training with automatic advancement/regression |
+| **RLTrainer** | REINFORCE with value baseline for policy fine-tuning |
+| **CompositionDiscovery** | Mines co-occurring action subsequences → proposes macro actions |
+
+## Project Structure
+
+```
+actformers/
+├── pyproject.toml                     # Project config & dependencies
+├── configs/
+│   ├── model/{small,medium,large}.yaml
+│   ├── training/{curriculum,rl}.yaml
+│   └── experiment/addition_baseline.yaml
+├── actformers/
+│   ├── core/
+│   │   ├── action_space.py             # ActionToken, FactorizedEmbedding, MacroAction, ActionSpace
+│   │   ├── working_memory.py           # MemoryState (immutable), WorkingMemory module
+│   │   ├── execution_engine.py         # Action dispatcher (24 types, soft/hard branching)
+│   │   ├── primitives.py               # Differentiable computational primitives
+│   │   └── model.py                    # Top-level Actformer model
+│   ├── encoding/
+│   │   ├── numeric.py                  # Digit decomposition + transformer encoder
+│   │   └── output.py                   # Scalar and per-digit output decoders
+│   ├── prediction/
+│   │   ├── action_predictor.py          # Dual-attention next-action predictor
+│   │   └── value_net.py                # MLP critic for RL baseline
+│   ├── composition/
+│   │   ├── macro_library.py            # Macro registry with scoring & pruning
+│   │   └── discovery.py                # N-gram mining → macro proposal → probe evaluation
+│   ├── training/
+│   │   ├── curriculum.py               # 6-phase curriculum with automatic advancement
+│   │   ├── supervised_trainer.py       # Teacher-forcing training on ground-truth traces
+│   │   ├── rl_trainer.py               # REINFORCE + value baseline
+│   │   └── losses.py                   # ActionCrossEntropy, SupervisedOutput, RLPolicy losses
+│   ├── data/
+│   │   ├── trace_generator.py          # Symbolic executor for addition/subtraction/multiplication/reversal
+│   │   ├── datasets.py                 # PyTorch datasets with normalization & caching
+│   │   └── tasks/{addition,subtraction,multiplication,digit_reversal}.py
+│   └── eval/
+│       ├── evaluator.py               # OOD generalization evaluator
+│       └── metrics.py                  # exact_match, per_digit, ood_gap metrics
+├── scripts/
+│   ├── train.py                        # Model setup & quick verification
+│   ├── eval.py                         # Trace correctness verification (20,000 checks)
+│   ├── visualize_actions.py            # CLI trace visualizer
+│   └── run_all_experiments.py          # Complete 5-phase experiment pipeline
+├── tests/
+│   ├── test_action_space.py            # 10 tests (creation, roundtrip, clamping, frozen)
+│   ├── test_working_memory.py          # 5 tests (shapes, no-mutation, gradient isolation)
+│   ├── test_execution_engine.py        # 6 tests (primitive actions, halt flag, load)
+│   └── test_trace_generator.py         # 37 tests (addition, subtraction, multiplication, reversal, extraction)
+└── architecture/
+    └── actformer_starter.py            # Original single-file PoC (reference only)
+```
+
+## Installation
+
+```bash
+# Prerequisites
+python >= 3.10
+pytorch >= 2.0
+
+# Install dependencies
+pip install torch numpy matplotlib tqdm tensorboard rich einops
+
+# Dev dependencies
+pip install pytest pytest-benchmark hydra-core wandb
+
+# Run tests
+cd Actformers-main
+PYTHONPATH=. python -m pytest tests/ -v
+```
+
+## Quick Start
+
+### Verify the codebase
+```bash
+PYTHONPATH=. python scripts/eval.py
+# Runs 20,000 trace verification checks (0..99 + 0..99)
+```
+
+### Run a single training step
+```bash
+PYTHONPATH=. python scripts/train.py
+# Creates model (3.4M params), runs forward pass, sets up trainer
+```
+
+### Run the complete 5-phase experiment pipeline
+```bash
+PYTHONPATH=. python scripts/run_all_experiments.py
+# Phase 1: Supervised training (1-2 digit addition)
+# Phase 2: OOD generalization (test at 1x/2x/5x/10x)
+# Phase 3: Curriculum phase advancement (6 phases)
+# Phase 4: RL fine-tuning (REINFORCE + baseline)
+# Phase 5: Composition discovery (mine macro actions)
+```
+
+## Training Pipeline
+
+### Phase 1: Supervised Training
+- Teacher-forcing on ground-truth action traces
+- Input: 1-2 digit addition problems
+- Loss: Action cross-entropy + output MSE
+- Target: >95% exact match accuracy
+
+### Phase 2: OOD Generalization (Core Thesis Test)
+```
+Train digits | Test 1x | Test 2x | Test 5x | Test 10x
+2            | ??      | ???     | ???     | ???
+```
+The primary falsifiability test — standard transformers score near 0% at 5x. Actformer should maintain high accuracy at any scale.
+
+### Phase 3: Curriculum Phase Advancement
+Six phases with automatic progression:
+1. **PRIMITIVE_EXECUTION** — Learn individual action semantics
+2. **SHORT_SEQUENCES** — 1-digit arithmetic, < 20 steps
+3. **FULL_ALGORITHM** — 2-4 digit, full traces with carry/borrow
+4. **GENERALIZATION** — 3-10 digit, mixed supervised + RL
+5. **MULTI_TASK** — Multiple task types, transfer learning
+6. **COMPOSITION** — Macro action discovery enabled
+
+### Phase 4: RL Fine-Tuning
+- REINFORCE with learned value baseline
+- Reward shaping: +1 per correct digit, +2 exact match bonus
+- Fine-tunes from supervised checkpoint (never from scratch)
+
+### Phase 5: Composition Discovery
+- Mines co-occurring action subsequences from rollout buffer
+- Proposes macro candidates from frequent n-grams
+- Probe-evaluates on held-out set before adoption
+- Discovers patterns like ADD_WITH_CARRY (LOAD + ADD + ADD + OUTPUT)
+
+## Design Principles
+
+### Structured Action Tokens
+```python
+ActionToken(op_id=ADD, arg0=0, arg1=1, arg2=2, modifier=0)
+# Encoding: e = E_op(ADD) + E_arg0(0) + E_arg1(1) + E_arg2(2) + E_mod(0)
+# Zero hash collisions, fully composable
+```
+
+### Memory State Immutability
+Every state update returns a **new** MemoryState with cloned tensors:
+```python
+new_state = engine.execute(action, state, "train")  # state is NOT mutated
+```
+
+### Gradient Discipline
+- **Training mode**: Soft branching (sigmoid gates), straight-through estimators for discrete ops
+- **Inference mode**: Hard branching, argmax decisions
+- Controlled by explicit `execution_mode` parameter, NOT `model.eval()`
+
+### Factorized Embeddings
+```python
+# Instead of hash(action) → embedding_table[hash]:
+embedding = E_op[op_id] + E_arg0[arg0] + E_arg1[arg1] + E_arg2[arg2] + E_mod[modifier]
+# Composable, no collisions, parameter efficient
+```
+
+## Test Suite
+
+```bash
+PYTHONPATH=. python -m pytest tests/ -v
+
+# 58 tests total:
+#   test_action_space.py     — 10 tests (creation, roundtrip, clamping, frozen)
+#   test_working_memory.py    —  5 tests (shapes, no-mutation, gradient isolation)
+#   test_execution_engine.py  —  6 tests (ADD, SUBTRACT, MULTIPLY, NOP, HALT, LOAD)
+#   test_trace_generator.py   — 37 tests (addition, subtraction, multiplication, reversal, extraction)
+```
+
+## Model Configurations
+
+| Config | Registers | Dim | Layers | Heads | Params |
+|--------|-----------|-----|--------|-------|--------|
+| small  | 8         | 32  | 2      | 4     | ~1.7M  |
+| medium | 16        | 64  | 4      | 8     | ~8M    |
+| large  | 32        | 128 | 6      | 8     | ~30M   |
+
+## Known Limitations & TODOs
+
+- **Batch size**: Currently processes batch_size=1 in the action loop (action history is a flat list). Multi-batch support requires refactoring the history encoding.
+- **RL in-place operation**: The REINFORCE backward pass has a known issue with in-place modifications in the transformer decoder when re-running forward passes for gradient computation. The rollout collection works correctly; only the gradient update needs a graph isolation fix.
+- **Max trace generator**: The `generate_max_trace()` uses a simplified comparison instead of iterative COMPARE+conditional logic.
+- **Evaluation accuracy**: The current demo model shows ~0% exact match on 10-digit OOD because it trains on only 80 samples for 5 epochs. Production training with the medium/large configs and 10K+ samples for 50+ epochs is needed for meaningful results.
+
+## Citation
+
+If you use this codebase, please cite the Actformer architecture:
+
+```
+@misc{actformer2024,
+  title={Actformer: Learning Actions, Not Patterns},
+  author={Actformer Research Team},
+  year={2024},
+  url={https://github.com/actformer}
+}
+```
+
+## License
+
+MIT
+>>>>>>> 8df8900 (arch implementaiton)
