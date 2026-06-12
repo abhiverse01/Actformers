@@ -1483,9 +1483,9 @@ If you find Actformer useful or interesting, please consider:
 
 <br>
 
-[![Star](https://img.shields.io/github/stars/your-username/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/your-username/actformer/stargazers)
-[![Fork](https://img.shields.io/github/forks/your-username/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/your-username/actformer/fork)
-[![Watch](https://img.shields.io/github/watchers/your-username/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/your-username/actformer/watchers)
+[![Star](https://img.shields.io/github/stars/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/actformer/stargazers)
+[![Fork](https://img.shields.io/github/forks/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/actformer/fork)
+[![Watch](https://img.shields.io/github/watchers/actformer?style=for-the-badge&logo=github&logoColor=white)](https://github.com/actformer/watchers)
 
 <br>
 
